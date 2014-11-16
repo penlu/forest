@@ -1,5 +1,22 @@
+// transition type listings
 var linkTransitions = ["link", "manual_subframe", "form_submit"]
 var rootTransitions = ["typed", "generated", "keyword", "keyword_generated", "auto_bookmark"]
+
+// save a transition from one URL to another
+// transitions FROM a null URL represent new roots
+// transitions TO a null URL represent tab closes
+function saveTransition(orig, dest) {
+
+}
+
+// called after piece of user data has been contributed
+// if all user data has been aggregated, then 
+function handleUserAction(tabId) {
+	console.log("tab ID: ".concat(tabId))
+}
+
+// cache storage for navigation events
+var navigationEventCache = {}
 
 chrome.webNavigation.onCommitted.addListener(
 	function(details)
@@ -18,23 +35,44 @@ chrome.webNavigation.onCommitted.addListener(
 		{
 			console.log("Navigation: ROOT")
 		}
-		else
+		else	// something else (do nothing)
 		{
 			console.log("Navigation: IGNORE")
 		}
+
+		handleUserAction(details.tabId)
 	}
-);
+)
+
+// cache storage for tab events, specifically URL data
+var tabEventCache = {}
+
+chrome.tabs.onUpdated.addListener(
+	function(tabId, changeInfo, tab) {
+		console.log("~~~~~~~~~~~~~~~~~~~~~ TAB ~~~~~~~~~~~~~~~~~~~~~")
+		console.log("Tabs URL: ".concat(changeInfo.url))
+
+		if (typeof changeInfo.url !== "undefined") {
+			tabEventCache[tabId] = {
+				"url": changeInfo.url
+			}
+		}
+
+		// attempt to handle an action
+		handleUserAction(tabId)
+	}
+)
 
 chrome.tabs.onRemoved.addListener(
 	function (tabId)
 	{
 		var thisTab = tabId
 	}
-);
+)
 
 chrome.tabs.onActivated.addListener(
 	function (activeInfo)
 	{
 		var thisTab = activeInfo.tabId
 	}
-);
+)
