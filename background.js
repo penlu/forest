@@ -8,7 +8,7 @@ chrome.webNavigation.onCommitted.addListener(
 		console.log("URL: ".concat(details.url))
 
 		var type = details.transitionType
-		console.log("Type: ".concat(type))
+		console.log("Type: ".concat(type.toUpperCase()))
 
 		if (linkTransitions.indexOf(type) != -1)		// user clicked link
 		{
