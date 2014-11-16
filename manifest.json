@@ -1,12 +1,12 @@
 {
   "manifest_version": 2,
 
-  "name": "Webspider",
-  "description": "Tree-based visualization/classification of browsing history.",
+  "name": "Forest",
+  "description": "A tree-based visualization/classification of internet browsing history.",
   "version": "1.0",
 
   "icons": {
-    "300": "webspider.png"
+    "512": "forest.png"
   },
 
   "permissions": [
@@ -15,9 +15,10 @@
   ],
 
   "browser_action": {
-    "default_icon": "webspider.png"
+    "default_icon": "forest.png"
     //"default_popup": "popup.html"
   },
+
   "background": {
     "page": "background.html"
   }
