@@ -10,7 +10,7 @@ function saveTransition(orig, dest) {
 }
 
 // cache storage for navigation events
-var navigationEventCache = {}
+var navigationEventType = {}
 
 chrome.webNavigation.onCommitted.addListener(
 	function(details)
@@ -21,41 +21,36 @@ chrome.webNavigation.onCommitted.addListener(
 		var type = details.transitionType
 		console.log("Type: ".concat(type.toUpperCase()))
 
-		if (linkTransitions.indexOf(type) != -1)		// user clicked link
+		if (details.transitionQualifiers.indexOf("forward_back") == -1)	// user didn't use forward/back arrows
 		{
-			console.log("Navigation: LINK")
-		}
-		else if (rootTransitions.indexOf(type) != -1)	// user typed something into the box
-		{
-			console.log("Navigation: ROOT")
-		}
-		else	// something else (do nothing)
-		{
-			console.log("Navigation: IGNORE")
-		}
+			if (linkTransitions.indexOf(type) != -1)		// user clicked link
+			{
+				console.log("LINK ACTION")
+				navigationEventType[details.tabId] = "link"
+			}
+			else if (rootTransitions.indexOf(type) != -1)	// user typed something into the box
+			{
+				console.log("ROOT ACTION")
+				navigationEventType[details.tabId] = "root"
+			}
 
-		// TODO save this stuff conditionally on transitionQualifiers
-		navigationEventCache[details.tabId] = {
-			"transitionType": details.transitionType,
-			"transitionQualifiers": details.transitionQualifiers
+			handleUserAction(details.tabId)
 		}
-
-		handleUserAction(details.tabId)
 	}
 )
 
 // cache storage for tab events, specifically URL data
-var tabEventCache = {}
+var tabEventUrl = {}
 
 chrome.tabs.onUpdated.addListener(
-	function(tabId, changeInfo, tab) {
+	function(tabId, changeInfo, tab)
+	{
 		console.log("~~~~~~~~~~~~~~~~~~ TAB UPDATED ~~~~~~~~~~~~~~~~~~")
 		console.log("Tab URL: ".concat(changeInfo.url))
 
-		if (typeof changeInfo.url !== "undefined") {
-			tabEventCache[tabId] = {
-				"url": changeInfo.url
-			}
+		if (typeof changeInfo.url !== "undefined")
+		{
+			tabEventUrl[tabId] = changeInfo.url
 		}
 
 		// attempt to handle an action
@@ -63,32 +58,28 @@ chrome.tabs.onUpdated.addListener(
 	}
 )
 
-chrome.tabs.onCreated.addListener(
-	function(tab) {
-		console.log("~~~~~~~~~~~~~~~~~~ TAB CREATED ~~~~~~~~~~~~~~~~~~")
-		console.log("New Tab ID: ".concat(tab.tabId))
-		console.log("New Tab URL: ".concat(tab.url))
-	}
-)
-
 chrome.tabs.onReplaced.addListener(
-	function(addedTabId, removedTabId) {
+	function(addedTabId, removedTabId)
+	{
 		console.log("~~~~~~~~~~~~~~~~~~ TAB REPLACED ~~~~~~~~~~~~~~~~~~")
 		console.log("Added Tab: ".concat(addedTabId))
 		console.log("Removed Tab: ".concat(removedTabId))
 
-		var addedTabInfo = chrome.tabs.get(addedTabId, function(tab) {
-			console.log("Added Tab URL: ".concat(tab.url))
-			if (typeof tab.url !== "undefined") {
-				tabEventCache[addedTabId] = {
-					"url": tab.url
+		var addedTabInfo = chrome.tabs.get(addedTabId,
+			function(tab)
+			{
+				console.log("Added Tab URL: ".concat(tab.url))
+				if (typeof tab.url !== "undefined")
+				{
+					tabEventUrl[addedTabId] = tab.url
 				}
-			}
-		})
 		
-		tabRemoved(removedTabId)
+				// asynchronous callback needs synchronization
+				tabRemoved(removedTabId)
 
-		handleUserAction(addedTabId)
+				handleUserAction(addedTabId)
+			}
+		)
 	}
 )
 
@@ -97,10 +88,34 @@ function tabRemoved(tabId)
 {
 	console.log("~~~~~~~~~~~~~~~~~~ TAB REMOVED ~~~~~~~~~~~~~~~~~~")
 	console.log("Tab Removed: ".concat(tabId))
-	delete navigationEventCache[tabId]
-	delete tabEventCache[tabId]
+
+	delete navigationEventType[tabId]
+	delete tabEventUrl[tabId]
 }
 chrome.tabs.onRemoved.addListener(tabRemoved)
+
+// called after piece of user data has been contributed
+// if all user data has been aggregated, then perform navigation saving etc
+function handleUserAction(tabId) {
+	console.log("Handle user action call, tab ID: ".concat(tabId))
+	if (typeof navigationEventType[tabId] !== "undefined" && typeof tabEventUrl[tabId] !== "undefined")
+	{
+		console.log("!!!!!!!!!!!! HANDLING NOW !!!!!!!!!!!!")
+		var userAction =
+		{
+			"url": tabEventUrl[tabId],
+			"actiontype": navigationEventType[tabId]
+		}
+		console.log("Handled URL: ".concat(userAction.url))
+		console.log("Handled Transition Type: ".concat(userAction.actiontype))
+
+		// remove entries after use
+		delete navigationEventType[tabId]
+		delete tabEventUrl[tabId]
+	}
+}
+
+
 
 // keep track of current active tab
 var activeTab = -1
@@ -111,22 +126,3 @@ chrome.tabs.onActivated.addListener(
 		activeTab = activeInfo.tabId
 	}
 )
-
-// called after piece of user data has been contributed
-// if all user data has been aggregated, then perform navigation saving etc
-function handleUserAction(tabId) {
-	console.log("Handle user action call, tab ID: ".concat(tabId))
-	if (typeof navigationEventCache[tabId] !== "undefined" && typeof tabEventCache[tabId] !== "undefined") {
-		console.log("!!!!!!!!!!!! HANDLING NOW !!!!!!!!!!!!")
-		var userAction = {
-			"url": tabEventCache[tabId].url,
-			"transitionType": navigationEventCache[tabId].transitionType,
-			"transitionQualifiers": navigationEventCache[tabId].transitionQualifiers
-		}
-		console.log("Handled URL: ".concat(userAction.url))
-		console.log("Handled Transition Type: ".concat(userAction.transitionType))
-		console.log("Handled Transition Qualifiers: ".concat(userAction.transitionQualifiers))
-		delete navigationEventCache[tabId]
-		delete tabEventCache[tabId]
-	}
-}
