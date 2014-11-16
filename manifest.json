@@ -10,8 +10,6 @@
   },
 
   "permissions": [
-    "https://*/*",
-    "http://*/*",
     "webNavigation",
     "storage"
   ],
