@@ -1,3 +1,3 @@
-chrome.webNavigation.onBeforeNavigate.addListener(function() {
-	console.log("navigation detected!");
+chrome.webNavigation.onBeforeNavigate.addListener(function(details) {
+	console.log("navigation detected! url is ".concat(details.url));
 })
