@@ -11,7 +11,8 @@
 
   "permissions": [
     "webNavigation",
-    "storage"
+    "storage",
+    "tabs"
   ],
 
   "browser_action": {
