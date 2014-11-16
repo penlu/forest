@@ -49,7 +49,7 @@ var tabEventCache = {}
 
 chrome.tabs.onUpdated.addListener(
 	function(tabId, changeInfo, tab) {
-		console.log("================== TAB ==================")
+		console.log("================== TAB UPDATED ==================")
 		console.log("Tab URL: ".concat(changeInfo.url))
 
 		if (typeof changeInfo.url !== "undefined") {
@@ -60,6 +60,14 @@ chrome.tabs.onUpdated.addListener(
 
 		// attempt to handle an action
 		handleUserAction(tabId)
+	}
+)
+
+chrome.tabs.onReplaced.addListener(
+	function(addedTabId, removedTabId) {
+		console.log("================== TAB REPLACED ==================")
+		console.log("Added Tab: ".concat(addedTabId))
+		console.log("Removed Tab: ".concat(removedTabId))
 	}
 )
 
