@@ -5,12 +5,20 @@
   "description": "Tree-based visualization/classification of browsing history.",
   "version": "1.0",
 
+  "icons": {
+    "200": "webspider.png"
+  },
+
   "permissions": [
     "https://*/*",
     "http://*/*"
   ],
+
   "browser_action": {
-    "default_icon": "webspider.png",
-    "default_popup": "popup.html"
+    "default_icon": "webspider.png"
+    //"default_popup": "popup.html"
+  },
+  "background": {
+    "page": "background.html"
   }
 }
