@@ -6,12 +6,13 @@
   "version": "1.0",
 
   "icons": {
-    "200": "webspider.png"
+    "300": "webspider.png"
   },
 
   "permissions": [
     "https://*/*",
-    "http://*/*"
+    "http://*/*",
+    "webNavigation"
   ],
 
   "browser_action": {
