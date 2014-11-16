@@ -1,0 +1,16 @@
+{
+  "manifest_version": 2,
+
+  "name": "Webspider",
+  "description": "Tree-based visualization/classification of browsing history.",
+  "version": "1.0",
+
+  "permissions": [
+    "https://*/*",
+    "http://*/*"
+  ],
+  "browser_action": {
+    "default_icon": "webspider.png",
+    "default_popup": "popup.html"
+  }
+}
