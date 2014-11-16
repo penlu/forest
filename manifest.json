@@ -12,7 +12,8 @@
   "permissions": [
     "https://*/*",
     "http://*/*",
-    "webNavigation"
+    "webNavigation",
+    "storage"
   ],
 
   "browser_action": {
