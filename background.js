@@ -24,3 +24,17 @@ chrome.webNavigation.onCommitted.addListener(
 		}
 	}
 );
+
+chrome.tabs.onRemoved.addListener(
+	function (tabId)
+	{
+		var thisTab = tabId
+	}
+);
+
+chrome.tabs.onActivated.addListener(
+	function (activeInfo)
+	{
+		var thisTab = activeInfo.tabId
+	}
+);
