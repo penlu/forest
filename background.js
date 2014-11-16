@@ -12,7 +12,7 @@ function saveTransition(orig, dest) {
 // called after piece of user data has been contributed
 // if all user data has been aggregated, then 
 function handleUserAction(tabId) {
-	console.log("tab ID: ".concat(tabId))
+	console.log("Tab ID: ".concat(tabId))
 }
 
 // cache storage for navigation events
@@ -49,8 +49,8 @@ var tabEventCache = {}
 
 chrome.tabs.onUpdated.addListener(
 	function(tabId, changeInfo, tab) {
-		console.log("~~~~~~~~~~~~~~~~~~~~~ TAB ~~~~~~~~~~~~~~~~~~~~~")
-		console.log("Tabs URL: ".concat(changeInfo.url))
+		console.log("================== TAB ==================")
+		console.log("Tab URL: ".concat(changeInfo.url))
 
 		if (typeof changeInfo.url !== "undefined") {
 			tabEventCache[tabId] = {
