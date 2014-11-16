@@ -62,3 +62,17 @@ chrome.tabs.onUpdated.addListener(
 		handleUserAction(tabId)
 	}
 )
+
+chrome.tabs.onRemoved.addListener(
+	function (tabId)
+	{
+		var thisTab = tabId
+	}
+)
+
+chrome.tabs.onActivated.addListener(
+	function (activeInfo)
+	{
+		var thisTab = activeInfo.tabId
+	}
+)
