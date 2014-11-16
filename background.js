@@ -73,11 +73,15 @@ chrome.tabs.onReplaced.addListener(
 				{
 					tabEventUrl[addedTabId] = tab.url
 				}
+
+				console.log("Added tab status: ".concat(tab.status))
 		
 				// asynchronous callback needs synchronization
 				tabRemoved(removedTabId)
 
-				handleUserAction(addedTabId)
+				if (tab.status == "complete") {
+					handleUserAction(addedTabId) // handle preloaded pages
+				}
 			}
 		)
 	}
